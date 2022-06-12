@@ -90,11 +90,13 @@ function drawPulleys(circles) {
 var circles = []
 
 const rows = 4;
-const cols = 8;
+const cols = 6;
+
+var items = [];
 
 for (var i = 0; i < rows * cols; i++) {
     circles.push({
-        x: 100 + (i % rows) * 150,
+        x: 100 + (i % cols) * 150,
         y: 100 + Math.floor(i / cols) * 150
     })
 }
@@ -108,24 +110,8 @@ copy1 = copy1.slice(0, 6)
 
 drawPulleys(copy1)
 
-ctx.strokeStyle = "#db5d32"
+// ctx.strokeStyle = "#db5d32"
 
-var copy2 = JSON.parse(JSON.stringify(circles))
-copy2 = copy2.slice(6, 11)
+// var copy2 = JSON.parse(JSON.stringify(circles))
+// copy2 = copy2.slice(6, 11)
 // drawPulleys(copy2)
-
-console.log(circles)
-console.log(copy1)
-console.log(copy2)
-
-// const circles2 = .slice(8, 11)
-
-// circles2.forEach(circle => {
-//     drawCircle(circle.x, circle.y)
-// })
-
-// drawPulleys(circles2)
-
-// console.log(circles)
-// console.log(circles1)
-// console.log(circles2)
