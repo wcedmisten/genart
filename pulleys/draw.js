@@ -153,7 +153,7 @@ if ('URLSearchParams' in window) {
 
     // save a share link
     const encoded = btoa(JSON.stringify(circles))
-    document.getElementById("share").href = `/pulleys/?circles=${encoded}`;
+    document.getElementById("share").href = `/genart/pulleys/?circles=${encoded}`;
 
     drawPulleys(circles);
 }
