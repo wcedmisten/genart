@@ -5,6 +5,24 @@ var ctx = c.getContext("2d");
 
 ctx.lineWidth = 10;
 const RADIUS = 40
+const rows = 4;
+const cols = 6;
+
+const OFFSET_X = 100;
+const OFFSET_Y = 100;
+
+const DISTANCE_X = 150;
+const DISTANCE_Y = 150;
+
+const min_circles = 4;
+const max_circles = 10;
+
+const color_map = {
+    "W": "#FFFFFF",
+    "B": "#0000FF",
+    "Y": "#e3d919",
+    "R": "#FF0000"
+}
 
 // https://stackoverflow.com/a/12646864
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
@@ -17,16 +35,11 @@ function shuffleArray(array) {
     }
 }
 
-const colors = ["#0000FF", "#e3d919", "#FF0000"]
-
-function drawCircle(x, y) {
+function drawCircle(x, y, color) {
     ctx.beginPath();
     ctx.arc(x, y, RADIUS, 0, Math.PI * 2, true); // Outer
-    if (Math.random() > .8) {
-        ctx.fillStyle = colors[Math.floor(Math.random() * 3)]
-    } else {
-        ctx.fillStyle = "#FFFFFF"
-    }
+
+    ctx.fillStyle = color_map[color];
 
     ctx.fill();
     ctx.stroke();
@@ -54,9 +67,18 @@ function drawOffsetPulleyLine(x, y, x2, y2) {
     )
 }
 
-function drawPulleys(circles) {
-    circles.forEach(circle => {
-        drawCircle(circle.x, circle.y)
+function drawPulleys(circles1) {
+    circles1.forEach(circle => {
+        const x = OFFSET_X + circle.col * DISTANCE_X;
+        const y = OFFSET_Y + circle.row * DISTANCE_Y;
+        drawCircle(x, y, circle.color)
+    })
+
+    const circles = circles1.map((circle) => {
+        return {
+            x: OFFSET_X + circle.col * DISTANCE_X,
+            y: OFFSET_Y + circle.row * DISTANCE_Y,
+        }
     })
 
     circles.sort(sortPointY);
@@ -65,7 +87,7 @@ function drawPulleys(circles) {
     var convexHull = []
     chainHull_2D(circles, circles.length, convexHull)
 
-    const n = convexHull.length
+    const n = convexHull.length;
 
     var x = convexHull[n - 1].x;
     var y = convexHull[n - 1].y;
@@ -89,26 +111,52 @@ function drawPulleys(circles) {
 
 var circles = []
 
-const rows = 4;
-const cols = 6;
+const colors = ["Y", "B", "R"]
 
-var items = [];
+function generateCircles() {
+    for (var i = 0; i < rows * cols; i++) {
+        let color = "W"
 
-for (var i = 0; i < rows * cols; i++) {
-    circles.push({
-        x: 100 + (i % cols) * 150,
-        y: 100 + Math.floor(i / cols) * 150
-    })
+        if (Math.random() > .8) {
+            color = colors[Math.floor(Math.random() * 3)]
+        }
+        circles.push({
+            col: (i % cols),
+            row: Math.floor(i / cols),
+            color: color
+        })
+    }
+
+    shuffleArray(circles)
+
+    var copy1 = JSON.parse(JSON.stringify(circles))
+
+    const num_circles = Math.floor(
+        Math.random() * (max_circles - min_circles) + min_circles
+    )
+
+    return copy1.slice(0, num_circles)
 }
 
-shuffleArray(circles)
+// console.log(JSON.stringify(copy1))
+// console.log(encoded)
 
-ctx.strokeStyle = "#000000"
+if ('URLSearchParams' in window) {
+    const searchParams = new URLSearchParams(window.location.search);
+    let data = searchParams.get("circles")
+    var circles;
+    if (data) {
+        circles = JSON.parse(atob(data))
+    } else {
+        circles = generateCircles();
+    }
 
-var copy1 = JSON.parse(JSON.stringify(circles))
-copy1 = copy1.slice(0, 6)
+    // save a share link
+    const encoded = btoa(JSON.stringify(circles))
+    document.getElementById("share").href = `/pulleys/?circles=${encoded}`;
 
-drawPulleys(copy1)
+    drawPulleys(circles);
+}
 
 // ctx.strokeStyle = "#db5d32"
 
